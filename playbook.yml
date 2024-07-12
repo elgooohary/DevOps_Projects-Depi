@@ -1,0 +1,11 @@
+---
+- name: Create Users
+  hosts:
+    - ubuntu1
+    - centos1
+  
+  become: yes
+
+  roles:
+    #- create-users 
+    - manage-apache 

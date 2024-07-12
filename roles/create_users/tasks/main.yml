@@ -1,0 +1,7 @@
+---
+- name: create user
+  user:
+    name: "{{item.name}}"
+    shell: /bin/bash
+    comment: "{{ item.fullname}}" 
+  loop:  "{{ users }}"

@@ -1,0 +1,64 @@
+---
+- name: manage apache on servers
+  hosts:
+    - ubuntu3
+    - centos3
+  become: yes
+  vars_files:
+    - common.yml
+    - "{{ ansible_facts.os_family}}.yml"
+
+  handlers:
+   - name: restart apache
+     service:
+      name: "{{ apache_package }}"
+      state: started
+
+ 
+  tasks:
+   - name: debug os family
+     debug:
+       var: ansible_facts.os_family
+
+   - name: install apache on redhat
+     yum:
+       name: "{{ apache_package }}"
+       state: latest
+     when: ansible_facts.os_family == "RedHat"
+     notify: restart apache
+  
+   - name: install apache on debian
+     apt:
+       name: "{{ apache_package }}"
+       state: latest
+     when: ansible_facts.os_family == "Debian"
+     notify: restart apache  
+
+   - name: change index.html
+     template:
+      src: ./index.html.j2
+      dest: /var/www/html/index.html
+     notify: restart apache
+
+   - name: change port
+     lineinfile:
+       regex: "^Listen"
+       line: "Listen { http_port}"
+       path: "{{ apache_config_path}}"
+     notify: restart apache    
+
+- name: Create users
+  hosts:
+  - ubuntu3
+  - centos3  
+  become: yes
+ 
+  tasks:
+   - name: Create users
+     user:
+      name: "{{item.name}}"
+      shell: /bin/bash
+      comment: "{{ item.full_name}}"  
+     loop:
+       - { name: mahmoud, full_name: mahmoud mohamed rabee }             
+       - { name: Allab,  full_name: lab ansible }

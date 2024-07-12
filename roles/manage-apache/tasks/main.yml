@@ -1,0 +1,24 @@
+---
+- name: include os  specs vars
+  include_vars: "{{ ansible_facts.os_family }}.yml"
+
+- name: Install apache on servers
+  package:
+   name: "{{ apache_package }}"
+   state: latest
+  notify: restart apache
+
+  ignore_errors: yes 
+
+- name: change default port 
+  lineinfile:
+   regex: "^Listen"
+   line: "Listen {{ http_port }}"
+   path: "{{ apache_config_path  }}"  
+  notify: restart apache   
+
+- name: change index-file
+  template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+  notify: restart apache    
