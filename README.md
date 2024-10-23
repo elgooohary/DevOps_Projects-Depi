@@ -1,2 +1,1 @@
-# Depi_Labs
-The labs of Depi
+# Depi_Project
